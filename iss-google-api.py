@@ -8,8 +8,11 @@ import sys
 import json
 import requests
 import webbrowser
+from selenium import webdriver
+import urllib.parse
+
 # Get a google api key from the google developer web portal. I did not put my key public here, instead i parsed it into an argument 
-# If you have your key, you can uncomment line 14 and comment out line 13 so you can run the script directly.
+# If you have your key, you can uncomment line 17 and comment out line 16 so you can run the script directly.
 YOUR_GOOGLE_API_KEY = sys.argv[1]
 #YOUR_GOOGLE_API_KEY = '********************************'
 
@@ -40,14 +43,17 @@ print(location.json())
 # Get the important location parameter from the python object i.e ["global_code"]
 myquery = list(location.json().values())[0]["global_code"]
 
+# Encode the myquery string so it can execute a google search without escaping the + character. Thanks to urllib.parse
+parsed_query = urllib.parse.quote(myquery)
 
-# Now we open it with a google search via chrome browser. The problem with this part is that google search with the webbrowser python module always
-# escapes the "+" sign in the global_code string and replaces it with a space character. So in other to get the actual location in the opened google search
-# Tab, then you have to replace the space with '+'.
+
+# Now we open the parsed query via a google search using chrome browser with the help of the webbrowser module. 
 chrome_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
-url = "http://google.com/search?q="+myquery
+url = "https://google.com/search?q="+parsed_query
 webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path))
 webbrowser.get('chrome').open_new_tab(url)
+
+
 
 
 
